@@ -86,7 +86,7 @@ subsubsectionstyle=show/shaded/hide]
         \end{itemize}
     \end{block}
 
-    Containerizing AI servers also bring its own challenges: large model weights, GPU access, persistent user data.
+    Containerizing AI servers also brings its own challenges: large model weights, GPU access, persistent user data.
 \end{frame}
 
 
@@ -251,7 +251,7 @@ docker push yourusername/my-ai-server:1.0
     \begin{itemize}
         \item Application code and Python packages: inside, since every instance runs the same
         \item User database: volume, differ between instances and should survive container restart
-        \item Model weights: can be inside or volume or even none-persistent, each with caveats
+        \item Model weights: can be inside or volume or even non-persistent, each with caveats
     \end{itemize}
     \end{block}
 \end{frame}
@@ -271,7 +271,7 @@ COPY main.py db.py ./
     \end{minted}
 
     A fresh container now starts immediately, with no runtime download.
-    For very large models, consider fall back to downloading at startup.
+    For very large models, consider falling back to downloading at startup.
 \end{frame}
 
 \begin{frame}[fragile]{Persisting the database via a volume}
@@ -334,7 +334,7 @@ docker run -d --name ai-server \
 
     \begin{itemize}
         \item AMD GPUs use ROCm. Access via \texttt{--device /dev/kfd /dev/dri}, or AMD's container toolkit
-        \item Google TPUs requires some more complicated setup
+        \item Google TPUs require some more complicated setup
         \item Consumer NPUs (Apple Neural Engine, Qualcomm, AMD Ryzen AI) mostly are not exposed to containers
     \end{itemize}
 \end{frame}
@@ -364,7 +364,18 @@ docker run -d --name ai-server \
     \end{enumerate}
 \end{frame}
 
-% TODO: Add a "What you should walk away with" slide
+\begin{frame}{What you should walk away with}
+    By the end of the exercise, you should be able to:
+    \begin{enumerate}
+        \item Build a container image with a Dockerfile
+        \item Containerize an AI API server, including its model and GPU access
+        \item Decide what belongs in the image versus a mounted volume
+    \end{enumerate}
+
+    \vspace{0.5em}
+    Our AI server now ships as a single image that runs the same anywhere.
+    In the next module, we rent a computer in the cloud and run it there.
+\end{frame}
 
 
 \appendix

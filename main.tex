@@ -65,11 +65,13 @@
     \end{figure}
 \end{frame}
 
+
 \begin{frame}
 \tableofcontents[sectionstyle=show,
 subsectionstyle=show/shaded/hide,
 subsubsectionstyle=show/shaded/hide]
 \end{frame}
+
 
 
 \section{Building Images}
@@ -108,6 +110,7 @@ docker commit builder my-fastapi-image:dev
     \end{itemize}
 \end{frame}
 
+
 \begin{frame}[fragile]{Dockerfile, the recommended way}
     Describe the image as code instead of building it interactively.
     A Dockerfile is a plain-text file that lists, step by step, what should go into the image.
@@ -127,6 +130,7 @@ docker build -t my-hello:1.0 .
     The \texttt{.} is the build context: the set of files Docker has access to during the build.
 \end{frame}
 
+
 \begin{frame}{Common Dockerfile instructions}
     \begin{itemize}
         \item \texttt{FROM <image>}: pick the base image, always first
@@ -138,6 +142,7 @@ docker build -t my-hello:1.0 .
         \item \texttt{CMD ["program", "arg"]}: default command when a container starts
     \end{itemize}
 \end{frame}
+
 
 \begin{frame}[fragile]{Layer order matters}
     A Dockerfile maps closely to the layers of the resulting image, roughly one layer per instruction.
@@ -163,6 +168,7 @@ COPY . .
 \end{frame}
 
 
+
 \section{Containerizing the AI Server}
 
 \begin{frame}{Project layout}
@@ -175,6 +181,7 @@ COPY . .
         \item the \texttt{Dockerfile} we are about to write
     \end{itemize}
 \end{frame}
+
 
 \begin{frame}[fragile]{A first Dockerfile}
     \begin{minted}{dockerfile}
@@ -197,6 +204,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     Binding to \texttt{0.0.0.0} makes it listen on all interfaces, so port mapping can actually reach it.
 \end{frame}
 
+
 \begin{frame}[fragile]{Build and run}
 Build the container image.
     \begin{minted}{bash}
@@ -213,6 +221,7 @@ docker run -d --name ai-server -p 8000:8000 my-ai-server:1.0
     Now \texttt{http://127.0.0.1:8000/v1/classify} should be reachable from the A.2 client, just like in A.4.
     The difference: everything the server needs lives inside the container and is ready to be distributed at scale.
 \end{frame}
+
 
 \begin{frame}[fragile]{Push to a registry}
     A built image lives only on the machine where it was built until we push it to a registry.
@@ -233,6 +242,7 @@ docker push yourusername/my-ai-server:1.0
     For Docker Hub, the registry part is omitted.
     Anyone can fetch your image using \texttt{docker pull yourusername/my-ai-server:1.0}.
 \end{frame}
+
 
 
 \section{Layers vs Volumes}
@@ -256,6 +266,7 @@ docker push yourusername/my-ai-server:1.0
     \end{block}
 \end{frame}
 
+
 \begin{frame}[fragile]{Baking model weights into the image}
     For small models, download at build time is fine:
     \begin{minted}{dockerfile}
@@ -273,6 +284,7 @@ COPY main.py db.py ./
     A fresh container now starts immediately, with no runtime download.
     For very large models, consider falling back to downloading at startup.
 \end{frame}
+
 
 \begin{frame}[fragile]{Persisting the database via a volume}
     The SQLite database file stores our users, API keys, and request logs, and it must survive container removal.
@@ -296,6 +308,7 @@ docker run -d --name ai-server \
 \end{frame}
 
 
+
 \section{GPU Passthrough}
 
 \begin{frame}{Containers do not see the GPU by default}
@@ -310,6 +323,7 @@ docker run -d --name ai-server \
 
     GPUs need more than raw device files. They also need userspace driver libraries that match the kernel module on the host.
 \end{frame}
+
 
 \begin{frame}[fragile]{NVIDIA Container Toolkit}
     The standard tool for NVIDIA GPUs.
@@ -329,6 +343,7 @@ docker run -d --name ai-server \
     \end{itemize}
 \end{frame}
 
+
 \begin{frame}{Other AI hardware}
     The \texttt{--gpus} flag only covers NVIDIA.
 
@@ -338,6 +353,7 @@ docker run -d --name ai-server \
         \item Consumer NPUs (Apple Neural Engine, Qualcomm, AMD Ryzen AI) mostly are not exposed to containers
     \end{itemize}
 \end{frame}
+
 
 
 \section{Exercise}
@@ -355,6 +371,7 @@ docker run -d --name ai-server \
     \end{block}
 \end{frame}
 
+
 \begin{frame}{Extensions}
     \begin{enumerate}
         \item Pre-download the model weights at build time. Confirm with \texttt{docker logs} that no download happens at runtime
@@ -363,6 +380,7 @@ docker run -d --name ai-server \
         \item Push the image to Docker Hub. Pull on a different machine and confirm one \texttt{docker run} brings the server up
     \end{enumerate}
 \end{frame}
+
 
 \begin{frame}{What you should walk away with}
     By the end of the exercise, you should be able to:
@@ -376,6 +394,7 @@ docker run -d --name ai-server \
     Our AI server now ships as a single image that runs the same anywhere.
     In the next module, we rent a computer in the cloud and run it there.
 \end{frame}
+
 
 
 \appendix

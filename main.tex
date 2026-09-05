@@ -27,6 +27,11 @@
 \usepackage{AAU}
 \AtBeginSubsection{}
 \setbeamertemplate{navigation symbols}{}
+\ifdefined\hidenotes\else
+    \setbeameroption{show notes on second screen=right}
+    \setbeamerfont{note page}{size=\large}
+    \hypersetup{pdfkeywords={SP-Right}}
+\fi
 
 \def\cmd#1{\texttt{\color{red}\footnotesize $\backslash$#1}}
 \def\env#1{\texttt{\color{blue}\footnotesize #1}}
@@ -63,6 +68,8 @@
             \includegraphics[keepaspectratio, scale=0.5]{aau-logo-left-uk}
         \end{center}
     \end{figure}
+\note{
+}
 \end{frame}
 
 
@@ -70,6 +77,8 @@
 \tableofcontents[sectionstyle=show,
 subsectionstyle=show/shaded/hide,
 subsubsectionstyle=show/shaded/hide]
+\note{
+}
 \end{frame}
 
 
@@ -89,6 +98,8 @@ subsubsectionstyle=show/shaded/hide]
     \end{block}
 
     Containerizing AI servers also brings its own challenges: large model weights, GPU access, persistent user data.
+\note{
+}
 \end{frame}
 
 
@@ -108,6 +119,8 @@ docker commit builder my-fastapi-image:dev
         \item Every change requires going through the same manual steps
         \item Throws away the layered structure that makes images efficient in the first place
     \end{itemize}
+\note{
+}
 \end{frame}
 
 
@@ -128,6 +141,8 @@ docker build -t my-hello:1.0 .
     \end{minted}
 
     The \texttt{.} is the build context: the set of files Docker has access to during the build.
+\note{
+}
 \end{frame}
 
 
@@ -141,6 +156,8 @@ docker build -t my-hello:1.0 .
         \item \texttt{EXPOSE <port>}: document the port, does not actually publish it
         \item \texttt{CMD ["program", "arg"]}: default command when a container starts
     \end{itemize}
+\note{
+}
 \end{frame}
 
 
@@ -165,6 +182,8 @@ COPY . .
         \end{minted}
         \texttt{pip install} only reruns when \texttt{requirements.txt} changes.
     \end{block}
+\note{
+}
 \end{frame}
 
 
@@ -180,6 +199,8 @@ COPY . .
         \item \texttt{requirements.txt} listing the Python packages we need
         \item the \texttt{Dockerfile} we are about to write
     \end{itemize}
+\note{
+}
 \end{frame}
 
 
@@ -202,6 +223,8 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     Note the \texttt{--host 0.0.0.0} argument.
     By default Uvicorn binds to \texttt{127.0.0.1}, which inside a container only accepts traffic from that container.
     Binding to \texttt{0.0.0.0} makes it listen on all interfaces, so port mapping can actually reach it.
+\note{
+}
 \end{frame}
 
 
@@ -220,6 +243,8 @@ docker run -d --name ai-server -p 8000:8000 my-ai-server:1.0
 
     Now \texttt{http://127.0.0.1:8000/v1/classify} should be reachable from the A.2 client, just like in A.4.
     The difference: everything the server needs lives inside the container and is ready to be distributed at scale.
+\note{
+}
 \end{frame}
 
 
@@ -241,6 +266,8 @@ docker push yourusername/my-ai-server:1.0
     Tag format: \texttt{[<registry>/]<namespace>/<repository>:<tag>}.
     For Docker Hub, the registry part is omitted.
     Anyone can fetch your image using \texttt{docker pull yourusername/my-ai-server:1.0}.
+\note{
+}
 \end{frame}
 
 
@@ -264,6 +291,8 @@ docker push yourusername/my-ai-server:1.0
         \item Model weights: can be inside or volume or even non-persistent, each with caveats
     \end{itemize}
     \end{block}
+\note{
+}
 \end{frame}
 
 
@@ -283,6 +312,8 @@ COPY main.py db.py ./
 
     A fresh container now starts immediately, with no runtime download.
     For very large models, consider falling back to downloading at startup.
+\note{
+}
 \end{frame}
 
 
@@ -305,6 +336,8 @@ docker run -d --name ai-server \
         \item Server reads \texttt{DATABASE\_URL} from the environment
         \item We can swap the container for a newer image and keep the data
     \end{itemize}
+\note{
+}
 \end{frame}
 
 
@@ -322,6 +355,8 @@ docker run -d --name ai-server \
     \end{itemize}
 
     GPUs need more than raw device files. They also need userspace driver libraries that match the kernel module on the host.
+\note{
+}
 \end{frame}
 
 
@@ -341,6 +376,8 @@ docker run -d --name ai-server \
         \item \texttt{--gpus "device=0"}: only one specific GPU
         \item \texttt{--gpus 2}: limit to two GPUs
     \end{itemize}
+\note{
+}
 \end{frame}
 
 
@@ -352,6 +389,8 @@ docker run -d --name ai-server \
         \item Google TPUs require some more complicated setup
         \item Consumer NPUs (Apple Neural Engine, Qualcomm, AMD Ryzen AI) mostly are not exposed to containers
     \end{itemize}
+\note{
+}
 \end{frame}
 
 
@@ -369,6 +408,8 @@ docker run -d --name ai-server \
             \item Run the container and verify the A.2 client can reach it
         \end{enumerate}
     \end{block}
+\note{
+}
 \end{frame}
 
 
@@ -379,6 +420,8 @@ docker run -d --name ai-server \
         \item If you have an NVIDIA GPU, install the toolkit, run with \texttt{--gpus all}, move the model to \texttt{cuda}
         \item Push the image to Docker Hub. Pull on a different machine and confirm one \texttt{docker run} brings the server up
     \end{enumerate}
+\note{
+}
 \end{frame}
 
 
@@ -393,6 +436,8 @@ docker run -d --name ai-server \
     \vspace{0.5em}
     Our AI server now ships as a single image that runs the same anywhere.
     In the next module, we rent a computer in the cloud and run it there.
+\note{
+}
 \end{frame}
 
 
@@ -407,6 +452,8 @@ docker run -d --name ai-server \
 {\small \faEnvelope\ \href{mailto:lyan@cs.aau.dk}{lyan@cs.aau.dk} \\
 \faGlobe\ \href{https://www.yanlincs.com}{www.yanlincs.com}}
 \end{center}
+\note{
+}
 \end{frame}
 
 \end{document}

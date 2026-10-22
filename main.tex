@@ -168,75 +168,285 @@ subsubsectionstyle=show/shaded/hide]
 
 \section{Building Images}
 
-\begin{frame}[fragile]{The interactive approach, and why not}
-    Drop into a container, install things, snapshot it.
+\begin{frame}[fragile]{The interactive approach}
+  Docker allows for committing a container instance into an image.
+
     \begin{minted}{bash}
-docker run -it --name builder python:3.13 bash
+docker run -it -v $(pwd):/app --name ais-builder python:3.13 bash
+
+# Inside the container instance:
 pip install fastapi uvicorn
+mkdir -p /opt/ai-system && cp /app/main.py /opt/ai-system/
 exit
-docker commit builder my-fastapi-image:dev
+
+docker commit ais-builder ai-system:1.0
     \end{minted}
 
-    Works, but rarely a good idea.
-    \begin{itemize}
-        \item No record of what we actually installed
-        \item Nothing for teammates or our future selves to read
-        \item Every change requires going through the same manual steps
-        \item Throws away the layered structure that makes images efficient in the first place
-    \end{itemize}
 \note{
 }
 \end{frame}
 
 
-\begin{frame}[fragile]{Dockerfile, the recommended way}
-    Describe the image as code instead of building it interactively.
-    A Dockerfile is a plain-text file that lists, step by step, what should go into the image.
+\begin{frame}{The interactive approach}{Looks easy but a bad approach}
+  \texttt{docker commit} will squash everything we did to the instance into one opaque image layer.
 
-    \begin{minted}{dockerfile}
+  \begin{itemize}
+    \item \textbf{No record of the setup of our image:} prone to memory loss, challenges future revision to the image
+    \item \textbf{Throws away the layered structure:} breaks one of the major benefits of container images
+  \end{itemize}
+
+  % TODO: Embed a diagram demonstrating how docker commit squashes everything to one layer.
+\note{
+}
+\end{frame}
+
+
+\begin{frame}{The interactive approach}{Looks easy but a bad approach}
+  Like burning your modded game with a 100\% complete save file into a new game disc.
+
+  % TODO: Embed a diagram showing the process: image of an original Skyrim PS4/PS5 game disc -> screenshot of a running modded Skyrim -> new game disc with mod and save file burned in
+\note{
+}
+\end{frame}
+
+
+\begin{frame}{Building images using Dockerfile}
+  Document the building process of an image in a \textbf{Dockerfile}.
+  Docker can consistently build the image given its Dockerfile and the build context.
+
+  % TODO: Embed a diagram showing an example container image build process given a Dockerfile.
+\note{
+}
+\end{frame}
+
+
+\begin{frame}{Building images using Dockerfile}{Usually a good practice}
+  \begin{itemize}
+    \item \textbf{Clear record of the setup of our image:} Dockerfile serves as the record of the setup process, no worry about forgetting and easy to revise
+    \item \textbf{Corresponds to the layered structure:} each command in the Dockerfile corresponds to one image layer in the built image
+  \end{itemize}
+
+  % TODO: Embed a diagram showing the correspondence between Dockerfile and image layers
+\note{
+}
+\end{frame}
+
+
+\begin{frame}[fragile]{Building images using Dockerfile}{Build command}
+  \begin{minted}{bash}
+docker build -t <name>[:<tag>] [-f <dockerfile>] <context>
+  \end{minted}
+  \begin{itemize}
+    \item \texttt{-t <name>[:<tag>]}: name and tag of the image, tag defaults to \texttt{latest}
+    \item \texttt{-f <dockerfile>}: Dockerfile to use, defaults to \texttt{Dockerfile} in the build context
+    \item \texttt{<context>}: the \textbf{build context}, directory sent to Docker, the only files the build can access
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{minted}{bash}
+docker build -t ai-system:1.0 .
+  \end{minted}
+  \begin{itemize}
+    \item Build \texttt{ai-system:1.0} with the current directory as the build context
+  \end{itemize}
+
+\note{
+}
+\end{frame}
+
+
+\begin{frame}{What is a Dockerfile?}
+  Plain-text definition of how a container image is built, each line starts with a specific command.
+
+  \begin{itemize}
+      \item \texttt{FROM <image>}: pick the base image, always first
+      \item \texttt{WORKDIR <path>}: set the working directory inside the image
+      \item \texttt{COPY <src> <dest>}: bring files in from the build context
+      \item \texttt{RUN <cmd>}: execute a shell command during the build
+      \item \texttt{ENV KEY=value}: set an environment variable visible at runtime
+      \item \texttt{EXPOSE <port>}: document the port, does not actually publish it
+      \item \texttt{CMD ["program", "arg"]}: default command when a container starts
+  \end{itemize}
+
+\note{
+}
+\end{frame}
+
+
+\begin{frame}[fragile]{Dockerfile commands}{FROM}
+  \begin{minted}{dockerfile}
+FROM <image>[:<tag>]
+  \end{minted}
+  \begin{itemize}
+    \item \texttt{<image>}: name of the base image to build on top of, e.g., one from Docker Hub
+    \item \texttt{<tag>}: version of the base image, defaults to \texttt{latest} if omitted
+    \item Comes first in a Dockerfile, every later command builds on top of it
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{minted}{dockerfile}
 FROM python:3.13-slim
+  \end{minted}
+  \begin{itemize}
+    \item Start from the slim variant of the official Python 3.13 image
+  \end{itemize}
+
+\note{
+}
+\end{frame}
+
+
+\begin{frame}[fragile]{Dockerfile commands}{WORKDIR}
+  \begin{minted}{dockerfile}
+WORKDIR <path>
+  \end{minted}
+  \begin{itemize}
+    \item \texttt{<path>}: directory inside the image, created if it does not exist
+    \item Applies to all later commands, relative paths resolve against it
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{minted}{dockerfile}
 WORKDIR /app
-COPY hello.py .
-CMD ["python", "hello.py"]
-    \end{minted}
+  \end{minted}
+  \begin{itemize}
+    \item Later commands run in \texttt{/app}, and \texttt{.} as a destination refers to \texttt{/app}
+  \end{itemize}
 
-    Build with:
-    \begin{minted}{bash}
-docker build -t my-hello:1.0 .
-    \end{minted}
-
-    The \texttt{.} is the build context: the set of files Docker has access to during the build.
 \note{
 }
 \end{frame}
 
 
-\begin{frame}{Common Dockerfile instructions}
-    \begin{itemize}
-        \item \texttt{FROM <image>}: pick the base image, always first
-        \item \texttt{WORKDIR <path>}: set the working directory inside the image
-        \item \texttt{COPY <src> <dest>}: bring files in from the build context
-        \item \texttt{RUN <cmd>}: execute a shell command during the build
-        \item \texttt{ENV KEY=value}: set an environment variable visible at runtime
-        \item \texttt{EXPOSE <port>}: document the port, does not actually publish it
-        \item \texttt{CMD ["program", "arg"]}: default command when a container starts
-    \end{itemize}
+\begin{frame}[fragile]{Dockerfile commands}{COPY}
+  \begin{minted}{dockerfile}
+COPY <src> [<src> ...] <dest>
+  \end{minted}
+  \begin{itemize}
+    \item \texttt{<src>}: one or more files or directories from the build context
+    \item \texttt{<dest>}: path inside the image, relative to the working directory unless absolute
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{minted}{dockerfile}
+COPY requirements.txt .
+  \end{minted}
+  \begin{itemize}
+    \item Copy \texttt{requirements.txt} from the build context into the working directory
+  \end{itemize}
+
 \note{
 }
 \end{frame}
 
 
-\begin{frame}[fragile]{Layer order matters}
-    A Dockerfile maps closely to the layers of the resulting image, roughly one layer per instruction.
-    Docker caches layers between builds.
-    As soon as one layer's input changes, every layer on top of it has to be rebuilt as well.
+\begin{frame}[fragile]{Dockerfile commands}{RUN}
+  \begin{minted}{dockerfile}
+RUN <command>
+  \end{minted}
+  \begin{itemize}
+    \item \texttt{<command>}: shell command executed at build time, not when the container starts
+    \item Changes it makes to the file system are saved as a new image layer
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{minted}{dockerfile}
+RUN pip install --no-cache-dir -r requirements.txt
+  \end{minted}
+  \begin{itemize}
+    \item Install the Python packages into the image, without keeping pip's download cache
+  \end{itemize}
+
+\note{
+}
+\end{frame}
+
+
+\begin{frame}[fragile]{Dockerfile commands}{ENV}
+  \begin{minted}{dockerfile}
+ENV <key>=<value> [<key>=<value> ...]
+  \end{minted}
+  \begin{itemize}
+    \item \texttt{<key>=<value>}: name and value of an environment variable, multiple pairs allowed
+    \item Visible to later commands during the build and to the running container
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{minted}{dockerfile}
+ENV DATABASE_URL=sqlite:////app/data/ai_api.db
+  \end{minted}
+  \begin{itemize}
+    \item Default database location for the server, can be overridden with \texttt{docker run -e}
+  \end{itemize}
+
+\note{
+}
+\end{frame}
+
+
+\begin{frame}[fragile]{Dockerfile commands}{EXPOSE}
+  \begin{minted}{dockerfile}
+EXPOSE <port>[/<protocol>]
+  \end{minted}
+  \begin{itemize}
+    \item \texttt{<port>}: port the containerized program listens on
+    \item \texttt{<protocol>}: \texttt{tcp} or \texttt{udp}, defaults to \texttt{tcp} if omitted
+    \item Documentation only, publishing the port still needs \texttt{docker run -p}
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{minted}{dockerfile}
+EXPOSE 8000
+  \end{minted}
+  \begin{itemize}
+    \item Declare that the API server listens on port 8000 inside the container
+  \end{itemize}
+
+\note{
+}
+\end{frame}
+
+
+\begin{frame}[fragile]{Dockerfile commands}{CMD}
+  \begin{minted}{dockerfile}
+CMD ["<program>", "<arg1>", "<arg2>"]
+  \end{minted}
+  \begin{itemize}
+    \item \texttt{<program>}, \texttt{<argN>}: program to run and any number of arguments, as a JSON array
+    \item Default command when a container starts, replaced by any command given to \texttt{docker run}
+    \item Only the last \texttt{CMD} in a Dockerfile takes effect
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{minted}{dockerfile}
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+  \end{minted}
+  \begin{itemize}
+    \item Start the FastAPI server with Uvicorn, listening on port 8000
+  \end{itemize}
+
+\note{
+}
+\end{frame}
+
+
+\begin{frame}[fragile]{Command order in a Dockerfile}
+  As soon as one layer's input changes, every layer on top of it has to be rebuilt as well.
 
     \begin{block}{Worse order}
         \begin{minted}{dockerfile}
 COPY . .
 RUN pip install -r requirements.txt
         \end{minted}
-        Every edit to \texttt{main.py} invalidates the \texttt{COPY}, which forces \texttt{pip install} to rerun.
+        Every edit to \texttt{main.py} changes the input of \texttt{COPY}, which forces its subsequent layers (\texttt{pip install}) to rerun.
     \end{block}
 
     \begin{block}{Better order}

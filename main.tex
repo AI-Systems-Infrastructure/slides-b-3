@@ -86,28 +86,40 @@ subsubsectionstyle=show/shaded/hide]
 
 \section{Introduction}
 
-\begin{frame}{Recap of Module B.2: Container Fundamentals}
+\begin{frame}{Recap of Module B.2: Container Fundamentals}{Container standard}
   Container as an industry standard for streamlining the process of deploying our AI systems onto any* computer.
 
-  \begin{figure}[htpb]
-      \begin{center}
-          \includegraphics[width=0.9\textwidth,height=0.45\textheight,keepaspectratio]{module-b2-oci-standard}
-      \end{center}
-  \end{figure}
+  % TODO: Embed figures/module-b2-oci-standard.pdf
 
 \note{
 }
 \end{frame}
 
 
-\begin{frame}{Recap of Module B.2: Container Fundamentals}
+\begin{frame}{Recap of Module B.2: Container Fundamentals}{Why containers deliver the premise}
+  \begin{block}{Software deployment without containers}
+    \begin{itemize}
+      \item Setting up everything right on each computer the software is deployed to is tedious and prone to error
+      \item Multiple pieces of software running on the same computer might interfere with each other
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Software deployment with containers}
+    \begin{itemize}
+      \item A container \textbf{packs everything a piece of software needs in one self-contained package}
+      \item A container provides an isolated environment for software to run without interference
+    \end{itemize}
+  \end{block}
+
+\note{
+}
+\end{frame}
+
+
+\begin{frame}{Recap of Module B.2: Container Fundamentals}{Use containers in practice}
   Docker ecosystem that includes all tools we need to work with containers.
 
-  \begin{figure}[htpb]
-      \begin{center}
-          \includegraphics[width=0.9\textwidth,height=0.66\textheight,keepaspectratio]{module-b2-docker-ecosystem}
-      \end{center}
-  \end{figure}
+  % TODO: Embed figures/module-b2-docker-ecosystem.pdf
 
 \note{
 }
@@ -146,17 +158,15 @@ subsubsectionstyle=show/shaded/hide]
     \item How to build and distribute our AI system as containers
   \end{itemize}
 
-  \begin{figure}[htpb]
-      \begin{center}
-          \includegraphics[width=0.9\textwidth,height=0.66\textheight,keepaspectratio]{module-b2-docker-ecosystem-dockerfile}
-      \end{center}
-  \end{figure}
+  % TODO: Embed figures/module-b2-docker-ecosystem-dockerfile.pdf
   
 \note{
 }
 \end{frame}
 
 
+
+\section{Building Images}
 
 \begin{frame}[fragile]{The interactive approach, and why not}
     Drop into a container, install things, snapshot it.

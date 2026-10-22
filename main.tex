@@ -89,7 +89,11 @@ subsubsectionstyle=show/shaded/hide]
 \begin{frame}{Recap of Module B.2: Container Fundamentals}{Container standard}
   Container as an industry standard for streamlining the process of deploying our AI systems onto any* computer.
 
-  % TODO: Embed figures/module-b2-oci-standard.pdf
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.6\textheight,keepaspectratio]{module-b2-oci-standard}
+      \end{center}
+  \end{figure}
 
 \note{
 }
@@ -119,7 +123,11 @@ subsubsectionstyle=show/shaded/hide]
 \begin{frame}{Recap of Module B.2: Container Fundamentals}{Use containers in practice}
   Docker ecosystem that includes all tools we need to work with containers.
 
-  % TODO: Embed figures/module-b2-docker-ecosystem.pdf
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.66\textheight,keepaspectratio]{module-b2-docker-ecosystem}
+      \end{center}
+  \end{figure}
 
 \note{
 }
@@ -129,7 +137,11 @@ subsubsectionstyle=show/shaded/hide]
 \begin{frame}{How to build a container image?}{The premise}
   Deploying our AI systems as containers will be easier and more robust than doing it manually on each computer.
 
-  % TODO: Embed figures/module-b2-container-ship.pdf
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.66\textheight,keepaspectratio]{module-b2-container-ship}
+      \end{center}
+  \end{figure}
 \note{
 }
 \end{frame}
@@ -158,7 +170,11 @@ subsubsectionstyle=show/shaded/hide]
     \item How to build and distribute our AI system as containers
   \end{itemize}
 
-  % TODO: Embed figures/module-b2-docker-ecosystem-dockerfile.pdf
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.6\textheight,keepaspectratio]{module-b2-docker-ecosystem-dockerfile}
+      \end{center}
+  \end{figure}
   
 \note{
 }
@@ -195,7 +211,11 @@ docker commit ais-builder ai-system:1.0
     \item \textbf{Throws away the layered structure:} breaks one of the major benefits of container images
   \end{itemize}
 
-  % TODO: Embed a diagram demonstrating how docker commit squashes everything to one layer.
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.42\textheight,keepaspectratio]{module-b3-docker-commit}
+      \end{center}
+  \end{figure}
 \note{
 }
 \end{frame}
@@ -204,7 +224,11 @@ docker commit ais-builder ai-system:1.0
 \begin{frame}{The interactive approach}{Looks easy but a bad approach}
   Like burning your modded game with a 100\% complete save file into a new game disc.
 
-  % TODO: Embed a diagram showing the process: image of an original Skyrim PS4/PS5 game disc -> screenshot of a running modded Skyrim -> new game disc with mod and save file burned in
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.72\textheight,keepaspectratio]{module-b3-commit-game-disc}
+      \end{center}
+  \end{figure}
 \note{
 }
 \end{frame}
@@ -214,7 +238,11 @@ docker commit ais-builder ai-system:1.0
   Document the building process of an image in a \textbf{Dockerfile}.
   Docker can consistently build the image given its Dockerfile and the build context.
 
-  % TODO: Embed a diagram showing an example container image build process given a Dockerfile.
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.7\textheight,keepaspectratio]{module-b3-dockerfile-build}
+      \end{center}
+  \end{figure}
 \note{
 }
 \end{frame}
@@ -226,7 +254,11 @@ docker commit ais-builder ai-system:1.0
     \item \textbf{Corresponds to the layered structure:} each command in the Dockerfile corresponds to one image layer in the built image
   \end{itemize}
 
-  % TODO: Embed a diagram showing the correspondence between Dockerfile and image layers
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.54\textheight,keepaspectratio]{module-b3-dockerfile-layers}
+      \end{center}
+  \end{figure}
 \note{
 }
 \end{frame}
@@ -566,7 +598,19 @@ docker push yourusername/my-ai-server:1.0
 \end{frame}
 
 \begin{frame}{Files: baked into image or volume mapped?}{Game files: baked into disc or saved to per-user account?}
-  % TODO: Embed two images, left: PS5 game disc, right: the game's save file interface
+  \begin{figure}[htpb]
+      \begin{center}
+          \begin{subfigure}{0.31\textwidth}
+              \includegraphics[width=\textwidth]{ps5-game-disc}
+              \caption{Baked into the game disc}
+          \end{subfigure}
+          \hspace{0.04\textwidth}
+          \begin{subfigure}{0.62\textwidth}
+              \includegraphics[width=\textwidth]{gow-ragnarok-save-menu}
+              \caption{Saved to each player's account}
+          \end{subfigure}
+      \end{center}
+  \end{figure}
 \end{frame}
 
 

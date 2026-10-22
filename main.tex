@@ -23,7 +23,7 @@
 \institute{%
     \href{https://www.yanlincs.com}{www.yanlincs.com}
 }
-\date{September 1st, 2026}
+\date{October 26th, 2026}
 \usepackage{AAU}
 \AtBeginSubsection{}
 \setbeamertemplate{navigation symbols}{}
@@ -84,25 +84,78 @@ subsubsectionstyle=show/shaded/hide]
 \end{frame}
 
 
+\section{Introduction}
 
-\section{Building Images}
+\begin{frame}{Recap of Module B.2: Container Fundamentals}
+  Container as an industry standard for streamlining the process of deploying our AI systems onto any* computer.
 
-\begin{frame}{Recap: where we are}
-    In Module B.2 we used Docker to run programs from images someone else built and published.
-    That covers most off-the-shelf software, but our AI server from A.4 is not on Docker Hub.
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.45\textheight,keepaspectratio]{module-b2-oci-standard}
+      \end{center}
+  \end{figure}
 
-    \begin{block}{Building our own image}
-        \begin{itemize}
-            \item Install the Python dependencies our server needs
-            \item Decide what files go inside
-            \item Pick a default command for the container to run
-        \end{itemize}
-    \end{block}
-
-    Containerizing AI servers also brings its own challenges: large model weights, GPU access, persistent user data.
 \note{
 }
 \end{frame}
+
+
+\begin{frame}{Recap of Module B.2: Container Fundamentals}
+  Docker ecosystem that includes all tools we need to work with containers.
+
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.66\textheight,keepaspectratio]{module-b2-docker-ecosystem}
+      \end{center}
+  \end{figure}
+
+\note{
+}
+\end{frame}
+
+
+\begin{frame}{How to build a container image?}{The premise}
+  Deploying our AI systems as containers will be easier and more robust than doing it manually on each computer.
+
+  % TODO: Embed figures/module-b2-container-ship.pdf
+\note{
+}
+\end{frame}
+
+
+\begin{frame}{How to build a container image?}{The missing pieces}
+  The prerequisite of deploying our AI systems as containers: having a container image packed with everything our AI system needs to run.
+
+  \begin{itemize}
+    \item Source code of our API server
+    \item Source code and parameters of our AI model
+    \item Configurations like API keys and rate-limiting thresholds
+    \item Command to start the API server upon initialization of the container
+  \end{itemize}
+
+  All customized pieces that no existing container image on Docker Hub will have.
+  
+\note{
+}
+\end{frame}
+
+
+\begin{frame}{Overview of this module}
+  \begin{itemize}
+    \item How to build a custom container image using a Dockerfile
+    \item How to build and distribute our AI system as containers
+  \end{itemize}
+
+  \begin{figure}[htpb]
+      \begin{center}
+          \includegraphics[width=0.9\textwidth,height=0.66\textheight,keepaspectratio]{module-b2-docker-ecosystem-dockerfile}
+      \end{center}
+  \end{figure}
+  
+\note{
+}
+\end{frame}
+
 
 
 \begin{frame}[fragile]{The interactive approach, and why not}

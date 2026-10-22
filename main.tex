@@ -542,128 +542,54 @@ docker push yourusername/my-ai-server:1.0
 \end{frame}
 
 
+\begin{frame}{Files: baked into image or volume mapped?}
+  For files our AI system needs to use, we have to either:
+  \begin{itemize}
+    \item Bake them into the container image by \texttt{COPY}ing them in the Dockerfile
+    \item Mount them using volume mapping when we run the container
+  \end{itemize}
 
-\section{Layers vs Volumes}
-
-\begin{frame}{The recurring design choice}
-    For each file, we have to decide: inside the image as a layer, or mounted in from the outside as a volume?
-
-    \begin{block}{General principle}
-\begin{itemize}
-\item \textbf{Inside:} things that should be the same across every running instance
-\item \textbf{Volume:} things that should differ between instances and/or persist beyond one instance
-\end{itemize}
-    \end{block}
-
-    \begin{block}{Examples}
+  \begin{block}{General principle}
     \begin{itemize}
-        \item Application code and Python packages: inside, since every instance runs the same
-        \item User database: volume, differ between instances and should survive container restart
-        \item Model weights: can be inside or volume or even non-persistent, each with caveats
+      \item \textbf{Bake:} files that should be the same across every instance and read-only
+        \begin{itemize}
+          \item Source code, AI model weights, environment variable file, \dots
+        \end{itemize}
+      \item \textbf{Volume mapping:} files that should differ between instances
+        \begin{itemize}
+          \item Database, run logs, \dots
+        \end{itemize}
     \end{itemize}
-    \end{block}
+  \end{block}
 \note{
 }
 \end{frame}
 
-
-\begin{frame}[fragile]{Baking model weights into the image}
-    For small models, download at build time is fine:
-    \begin{minted}{dockerfile}
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Pre-download ResNet-18 weights into a layer
-RUN python -c "from torchvision.models import \
-                   resnet18, ResNet18_Weights; \
-               resnet18(weights=ResNet18_Weights.DEFAULT)"
-
-COPY main.py db.py ./
-    \end{minted}
-
-    A fresh container now starts immediately, with no runtime download.
-    For very large models, consider falling back to downloading at startup.
-\note{
-}
+\begin{frame}{Files: baked into image or volume mapped?}{Game files: baked into disc or saved to per-user account?}
+  % TODO: Embed two images, left: PS5 game disc, right: the game's save file interface
 \end{frame}
 
 
-\begin{frame}[fragile]{Persisting the database via a volume}
-    The SQLite database file stores our users, API keys, and request logs, and it must survive container removal.
-    If the database lives inside the writable layer, removing the container deletes all our data.
+\begin{frame}{AI hardware passthrough}
+  Containers are isolated from host hardware by default, thus having no access to any AI hardware.
 
-    \begin{minted}{bash}
-mkdir -p data
-
-docker run -d --name ai-server \
-    -p 8000:8000 \
-    -v $(pwd)/data:/app/data \
-    -e DATABASE_URL=sqlite:////app/data/ai_api.db \
-    my-ai-server:1.0
-    \end{minted}
-
+  \begin{itemize}
+    \item \texttt{--device <path>} grants access to one specific device file
+    \item After installing the NVIDIA Container Toolkit, NVIDIA GPUs can be passed through to containers with the \texttt{--gpus} flag
     \begin{itemize}
-        \item Database lives on the host, survives container removal
-        \item Server reads \texttt{DATABASE\_URL} from the environment
-        \item We can swap the container for a newer image and keep the data
+      \item \texttt{--gpus all}: every GPU on the host
+      \item \texttt{--gpus "device=0"}: only one specific GPU
+      \item \texttt{--gpus 2}: limit to two GPUs
     \end{itemize}
+    \item Consumer NPUs (Apple Neural Engine, Qualcomm, AMD Ryzen AI) mostly are not exposed to containers
+  \end{itemize}
 \note{
 }
 \end{frame}
 
 
 
-\section{GPU Passthrough}
-
-\begin{frame}{Containers do not see the GPU by default}
-    If we run our server on a machine with an NVIDIA GPU, the container needs explicit access to the GPU device.
-    Containers are isolated from host hardware, and the GPU has to be passed through.
-
-    \begin{itemize}
-        \item \texttt{--device <host>} grants access to one specific device file
-        \item Same pattern works for webcams, serial ports, USB, sound cards
-        \item \texttt{--privileged} drops all device restrictions at once, but strips away most of the isolation containers exist to provide
-    \end{itemize}
-
-    GPUs need more than raw device files. They also need userspace driver libraries that match the kernel module on the host.
-\note{
-}
-\end{frame}
-
-
-\begin{frame}[fragile]{NVIDIA Container Toolkit}
-    The standard tool for NVIDIA GPUs.
-    Handles the userspace libraries and bridges the host driver to the container.
-
-    \begin{minted}{bash}
-docker run -d --name ai-server \
-    --gpus all \
-    -p 8000:8000 \
-    my-ai-server:1.0
-    \end{minted}
-
-    \begin{itemize}
-        \item \texttt{--gpus all}: every GPU on the host
-        \item \texttt{--gpus "device=0"}: only one specific GPU
-        \item \texttt{--gpus 2}: limit to two GPUs
-    \end{itemize}
-\note{
-}
-\end{frame}
-
-
-\begin{frame}{Other AI hardware}
-    The \texttt{--gpus} flag only covers NVIDIA.
-
-    \begin{itemize}
-        \item AMD GPUs use ROCm. Access via \texttt{--device /dev/kfd /dev/dri}, or AMD's container toolkit
-        \item Google TPUs require some more complicated setup
-        \item Consumer NPUs (Apple Neural Engine, Qualcomm, AMD Ryzen AI) mostly are not exposed to containers
-    \end{itemize}
-\note{
-}
-\end{frame}
-
+\section{Summary}
 
 
 \section{Exercise}

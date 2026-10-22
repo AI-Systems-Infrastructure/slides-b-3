@@ -592,17 +592,14 @@ docker push yourusername/my-ai-server:1.0
 \section{Summary}
 
 
-\section{Exercise}
-
-\begin{frame}{Containerize the A.4 server}
+\begin{frame}{Exercise: Containerize the A.4 server}
     Turn the API server from the Module A.4 exercise into a container image.
-    Point the A.2 client at it and confirm end-to-end behavior is unchanged.
 
     \begin{block}{Outline}
         \begin{enumerate}
             \item Write a \texttt{Dockerfile} to containerize the API server
-            \item Run \texttt{docker build} with a tag you can remember. Watch the layers in the build log
-            \item Run the container and verify the A.2 client can reach it
+            \item Run \texttt{docker build} to build the container
+            \item Run the container and verify it is reachable from the host computer
         \end{enumerate}
     \end{block}
 \note{
@@ -610,29 +607,25 @@ docker push yourusername/my-ai-server:1.0
 \end{frame}
 
 
-\begin{frame}{Extensions}
-    \begin{enumerate}
-        \item Pre-download the model weights at build time. Confirm with \texttt{docker logs} that no download happens at runtime
-        \item Mount a host directory for the SQLite database. Register a user, stop and remove the container, start a new one with the same volume, verify data survived
-        \item If you have an NVIDIA GPU, install the toolkit, run with \texttt{--gpus all}, move the model to \texttt{cuda}
-        \item Push the image to Docker Hub. Pull on a different machine and confirm one \texttt{docker run} brings the server up
-    \end{enumerate}
+\begin{frame}{Preview of the next modules}
+\begin{itemize}
+  \item \textbf{In this module:} Everything we need to build and distribute container images of our AI system
+  \item \textbf{In the next two modules:} Places (computers) where our container image can be deployed, with different pros and cons
+\end{itemize}
+
 \note{
 }
 \end{frame}
 
 
-\begin{frame}{What you should walk away with}
-    By the end of the exercise, you should be able to:
-    \begin{enumerate}
-        \item Build a container image with a Dockerfile
-        \item Containerize an AI API server, including its model and GPU access
-        \item Decide what belongs in the image versus a mounted volume
-    \end{enumerate}
+\begin{frame}{Preview of the next lecture}
+  Workshop on the mini project and the exam.
+\begin{itemize}
+  \item \textbf{Mini project:} The expected outcome, report format, and what to submit
+  \item \textbf{Exam:} Modality, duration, and topics as an indication of the expected scope
+\end{itemize}
+  Plus a Q\&A session!
 
-    \vspace{0.5em}
-    Our AI server now ships as a single image that runs the same anywhere.
-    In the next module, we rent a computer in the cloud and run it there.
 \note{
 }
 \end{frame}

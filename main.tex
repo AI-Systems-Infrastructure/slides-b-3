@@ -463,23 +463,21 @@ COPY . .
 
 
 
-\section{Containerizing the AI Server}
+\section{Containerizing AI System}
 
 \begin{frame}{Project layout}
-    The end goal is a single image that bundles our code, its Python dependencies, and the model weights, so that anyone with our image can bring up the server with one \texttt{docker run}.
-
-    Files we need to containerize the AI API server from Module A.4:
-    \begin{itemize}
-        \item \texttt{main.py} and other Python files of the server
-        \item \texttt{requirements.txt} listing the Python packages we need
-        \item the \texttt{Dockerfile} we are about to write
-    \end{itemize}
+  Suppose we migrate our API server from Module A.4 into the following project structure.
+  \begin{itemize}
+      \item \texttt{main.py} and other Python scripts of the server
+      \item \texttt{requirements.txt} listing the Python packages we need
+      \item the \texttt{Dockerfile} we are about to write
+  \end{itemize}
 \note{
 }
 \end{frame}
 
 
-\begin{frame}[fragile]{A first Dockerfile}
+\begin{frame}[fragile]{Our Dockerfile}
     \begin{minted}{dockerfile}
 FROM python:3.13-slim
 
@@ -495,9 +493,12 @@ EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     \end{minted}
 
-    Note the \texttt{--host 0.0.0.0} argument.
-    By default Uvicorn binds to \texttt{127.0.0.1}, which inside a container only accepts traffic from that container.
-    Binding to \texttt{0.0.0.0} makes it listen on all interfaces, so port mapping can actually reach it.
+    \begin{itemize}
+      \item By default, our server only accepts requests from \texttt{localhost}
+      \item The \texttt{--host 0.0.0.0} argument makes our server accept requests from clients of all IP addresses
+      \item Even with port mapping, requests from outside the container instance won't be from \texttt{localhost}
+    \end{itemize}
+    
 \note{
 }
 \end{frame}
@@ -508,39 +509,34 @@ Build the container image.
     \begin{minted}{bash}
 docker build -t my-ai-server:1.0 .
     \end{minted}
-    First build is slow because PyTorch is large.
-    Subsequent builds are fast as long as \texttt{requirements.txt} does not change.
 
 Then run it with port mapping.
     \begin{minted}{bash}
 docker run -d --name ai-server -p 8000:8000 my-ai-server:1.0
     \end{minted}
 
-    Now \texttt{http://127.0.0.1:8000/v1/classify} should be reachable from the A.2 client, just like in A.4.
-    The difference: everything the server needs lives inside the container and is ready to be distributed at scale.
+Now \texttt{http://127.0.0.1:8000/v1/classify} should be reachable from the host computer.
 \note{
 }
 \end{frame}
 
 
-\begin{frame}[fragile]{Push to a registry}
-    A built image lives only on the machine where it was built until we push it to a registry.
-    Like Git repositories, container images are pushed and pulled to and from registries.
+\begin{frame}[fragile]{Distribute our image to Docker Hub}
+  Like GitHub repositories, container images can be pushed to Docker Hub (or other container registries).
 
     \begin{minted}{bash}
-# 1. Log in (Docker Hub example)
+# 1. Log in
 docker login
 
 # 2. Tag the local image with the registry path
+# Tag format: [<registry>/]<namespace>/<repository>:<tag>
 docker tag my-ai-server:1.0 yourusername/my-ai-server:1.0
 
 # 3. Push
 docker push yourusername/my-ai-server:1.0
     \end{minted}
 
-    Tag format: \texttt{[<registry>/]<namespace>/<repository>:<tag>}.
-    For Docker Hub, the registry part is omitted.
-    Anyone can fetch your image using \texttt{docker pull yourusername/my-ai-server:1.0}.
+    Anyone can now pull our image using \texttt{docker pull yourusername/my-ai-server:1.0}.
 \note{
 }
 \end{frame}
